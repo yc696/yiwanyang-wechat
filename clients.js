@@ -77,6 +77,9 @@ export class WeChatClient {
             text: { content },
         };
 
+        // 添加发送前日志
+        console.log(`[${new Date().toISOString()}] [INFO] [WeChatClient] [${touser}] [-] 准备发送文本消息，长度: ${content.length}`);
+
         try {
             const response = await fetch(url, {
                 method: 'POST',
@@ -89,14 +92,20 @@ export class WeChatClient {
 
             if (!response.ok) {
                 const errorText = await response.text();
+                // 添加发送失败日志
+                console.error(`[${new Date().toISOString()}] [ERROR] [WeChatClient] [${touser}] [-] 文本消息发送失败: HTTP ${response.status} - ${errorText}`);
                 throw new Error(`发送文本消息失败: ${errorText}`);
             }
 
             const result = await response.json();
             if (result.errcode !== 0) {
+                // 添加发送失败日志
+                console.error(`[${new Date().toISOString()}] [ERROR] [WeChatClient] [${touser}] [-] 文本消息发送失败: ${JSON.stringify(result)}`);
                 throw new Error(`发送文本消息失败: ${JSON.stringify(result)}`);
             }
 
+            // 添加发送成功日志
+            console.log(`[${new Date().toISOString()}] [INFO] [WeChatClient] [${touser}] [${result.msgid}] 文本消息发送成功`);
             return result;
         } catch (error) {
             console.error('发送消息失败:', error);
@@ -238,6 +247,9 @@ export class WeChatClient {
             image: { media_id: mediaId },
         };
 
+        // 添加发送前日志
+        console.log(`[${new Date().toISOString()}] [INFO] [WeChatClient] [${touser}] [-] 准备发送图片消息，媒体ID: ${mediaId}`);
+
         try {
             const response = await fetch(url, {
                 method: 'POST',
@@ -248,14 +260,20 @@ export class WeChatClient {
 
             if (!response.ok) {
                 const errorText = await response.text();
+                // 添加发送失败日志
+                console.error(`[${new Date().toISOString()}] [ERROR] [WeChatClient] [${touser}] [-] 图片消息发送失败: HTTP ${response.status} - ${errorText}`);
                 throw new Error(`发送图片消息失败: ${errorText}`);
             }
 
             const result = await response.json();
             if (result.errcode !== 0) {
+                // 添加发送失败日志
+                console.error(`[${new Date().toISOString()}] [ERROR] [WeChatClient] [${touser}] [-] 图片消息发送失败: ${JSON.stringify(result)}`);
                 throw new Error(`发送图片消息失败: ${JSON.stringify(result)}`);
             }
 
+            // 添加发送成功日志
+            console.log(`[${new Date().toISOString()}] [INFO] [WeChatClient] [${touser}] [${result.msgid}] 图片消息发送成功`);
             return result;
         } catch (error) {
             console.error('发送图片消息失败:', error);
@@ -397,6 +415,9 @@ export class WeChatClient {
             file: { media_id: mediaId },
         };
 
+        // 添加发送前日志
+        console.log(`[${new Date().toISOString()}] [INFO] [WeChatClient] [${touser}] [-] 准备发送文件消息，媒体ID: ${mediaId}`);
+
         try {
             const response = await fetch(url, {
                 method: 'POST',
@@ -407,14 +428,20 @@ export class WeChatClient {
 
             if (!response.ok) {
                 const errorText = await response.text();
+                // 添加发送失败日志
+                console.error(`[${new Date().toISOString()}] [ERROR] [WeChatClient] [${touser}] [-] 文件消息发送失败: HTTP ${response.status} - ${errorText}`);
                 throw new Error(`发送文件消息失败: ${errorText}`);
             }
 
             const result = await response.json();
             if (result.errcode !== 0) {
+                // 添加发送失败日志
+                console.error(`[${new Date().toISOString()}] [ERROR] [WeChatClient] [${touser}] [-] 文件消息发送失败: ${JSON.stringify(result)}`);
                 throw new Error(`发送文件消息失败: ${JSON.stringify(result)}`);
             }
 
+            // 添加发送成功日志
+            console.log(`[${new Date().toISOString()}] [INFO] [WeChatClient] [${touser}] [${result.msgid}] 文件消息发送成功`);
             return result;
         } catch (error) {
             console.error('发送文件消息失败:', error);

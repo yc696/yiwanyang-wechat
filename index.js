@@ -562,13 +562,20 @@ async function processUserMessage(externalUserid, content, msgid, msgKfId, wxCli
         const messageChunkSize = 1024;
         const messageChunkCount = 5;
         if (assistantMessage.length > messageChunkSize) {
+            // 添加分块发送日志
+            console.log(`[${new Date().toISOString()}] [INFO] [MessageProcessor] [${externalUserid}] [${msgid}] 消息长度: ${assistantMessage.length}，需要分块发送`);
+            
             const messageChunks = splitStringByLength(assistantMessage.trim(), messageChunkSize);
             for (let i = 0; i < messageChunks.length; i++) {
                 const chunk = messageChunks[i];
                 if (i + 1 === messageChunkCount || i === messageChunks.length - 1) {
-                    await wireNote(externalUserid, msgKfId, msgid, content, assistantMessage, env);
+                    const result = await wireNote(externalUserid, msgKfId, msgid, content, assistantMessage, env);
+                    // 添加文件发送成功日志
+                    console.log(`[${new Date().toISOString()}] [INFO] [MessageProcessor] [${externalUserid}] [${result}] 完整回答文件发送成功`);
                 } else {
                     await wxClient.sendTextMessage(externalUserid, msgKfId, chunk);
+                    // 添加分块发送成功日志
+                    console.log(`[${new Date().toISOString()}] [INFO] [MessageProcessor] [${externalUserid}] [${msgid}] 第${i+1}块消息发送成功，大小: ${chunk.length}`);
                 }
             }
         } else {
@@ -623,9 +630,19 @@ async function wireNote(externalUserid, msgKfId, msgid, question, value, env) {
     const blob = new Blob([value], { type: 'text/plain' });
     const file = new File([blob], `${question}-完整回答-${msgid}.txt`, { type: 'text/plain' });
 
+    // 添加文件上传前日志
+    console.log(`[${new Date().toISOString()}] [INFO] [MessageProcessor] [${externalUserid}] [${msgid}] 准备上传文件，大小: ${value.length} 字节`);
+
     // 传给微信接口
     const { media_id } = await wxClient.uploadMedia(wxClient.mediaType.file, file, `${question}-完整回答-${msgid}.txt`);
 
+    // 添加文件上传成功日志
+    console.log(`[${new Date().toISOString()}] [INFO] [MessageProcessor] [${externalUserid}] [${msgid}] 文件上传成功，媒体ID: ${media_id}`);
+
     const result = await wxClient.sendFileMessage(externalUserid, msgKfId, media_id);
+    
+    // 添加文件发送成功日志
+    console.log(`[${new Date().toISOString()}] [INFO] [MessageProcessor] [${externalUserid}] [${result.msgid}] 文件消息发送成功`);
+    
     return result.msgid;
 }
